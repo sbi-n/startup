@@ -21,9 +21,9 @@ local function execute(modules: { Module }, name: string, ...: any)
 		local func = module[name]
 
 		if func then
-			local message = select(2, xpcall(func, debug.traceback, ...))
+			local success, message = xpcall(func, debug.traceback, ...)
 
-			if message then
+			if not success then
 				warn(`error while running "{name}":\n\n{message}`)
 			end
 		end
