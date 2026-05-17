@@ -2,10 +2,15 @@ local RunService = game:GetService("RunService")
 
 local Startup = {}
 
-export type Module = {
+export type Controller = {
+	onRender: (deltaTime: number) -> ()?,
+}
+
+export type Service = {}
+
+export type Module = (Controller | Service) & {
 	onStart: () -> ()?,
 	onStep: (deltaTime: number) -> ()?,
-	onRender: (deltaTime: number) -> ()?,
 	[string]: (...any) -> ...any,
 }
 
@@ -16,7 +21,11 @@ local function execute(modules: { Module }, name: string, ...: any)
 		local func = module[name]
 
 		if func then
-			task.spawn(func, ...)
+			local message = select(2, xpcall(func, debug.traceback, ...))
+
+			if message then
+				warn(`error while running "{name}":\n\n{message}`)
+			end
 		end
 	end
 end
