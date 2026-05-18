@@ -4,9 +4,6 @@ A simple knit-like Startup
 # Installion
 Wally
 
-# License
-No
-
 # Example
 On client,
 ```luau

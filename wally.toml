@@ -2,6 +2,7 @@
 name = "sbi-n/startup"
 description = "https://github.com/sbi-n/startup"
 version = "0.2.0"
+license = "MIT"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 
