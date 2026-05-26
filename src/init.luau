@@ -18,7 +18,7 @@ local Modules: { Module } = {}
 
 local function execute(modules: { Module }, name: string, ...: any)
 	for _, module in modules do
-		local func = module[name]
+		local func = rawget(module, name)
 
 		if func then
 			local success, message = xpcall(func, debug.traceback, ...)
