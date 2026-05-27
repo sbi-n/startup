@@ -30,8 +30,8 @@ local function execute(modules: { Module }, name: string, ...: any)
 	end
 end
 
-function Startup.add(module: Module)
-	table.insert(Modules, module)
+function Startup.add(module)
+	table.insert(Modules, module :: Module)
 end
 
 function Startup.run()
