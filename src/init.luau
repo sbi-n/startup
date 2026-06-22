@@ -1,6 +1,7 @@
-local RunService = game:GetService("RunService")
+local RunService = game and game:GetService("RunService")
 
 local Startup = {}
+Startup.__index = Startup
 
 export type Controller = {
 	onRender: (deltaTime: number) -> ()?,
@@ -14,10 +15,23 @@ export type Module = (Controller | Service) & {
 	[string]: (...any) -> ...any,
 }
 
-local Modules: { Module } = {}
+export type Startup = typeof(setmetatable(
+	{} :: {
+		modules: { Module },
+	},
+	Startup
+))
 
-local function execute(modules: { Module }, name: string, ...: any)
-	for _, module in modules do
+function Startup.new()
+	local self = setmetatable({
+		modules = {},
+	}, Startup)
+
+	return self
+end
+
+function Startup.execute(self: Startup, name: string, ...: any)
+	for _, module in self.modules do
 		local func = rawget(module, name)
 
 		if func then
@@ -30,20 +44,20 @@ local function execute(modules: { Module }, name: string, ...: any)
 	end
 end
 
-function Startup.add(module)
-	table.insert(Modules, module :: Module)
+function Startup.add(self: Startup, module)
+	table.insert(self.modules, module :: Module)
 end
 
-function Startup.run()
-	execute(Modules, "onStart")
+function Startup.run(self: Startup)
+	self:execute("onStart")
 
 	RunService.Heartbeat:Connect(function(deltaTime: number)
-		execute(Modules, "onStep", deltaTime)
+		self:execute("onStep", deltaTime)
 	end)
 
 	if RunService:IsClient() then
 		RunService.RenderStepped:Connect(function(deltaTime: number)
-			execute(Modules, "onRender", deltaTime)
+			self:execute("onRender", deltaTime)
 		end)
 	end
 end
