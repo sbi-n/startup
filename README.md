@@ -9,17 +9,21 @@ On client,
 ```luau
 local Startup = require("path/to/startup")
 
-Startup.add(require("@controllers/hello-controller"))
-Startup.add(require("@controllers/world-controller"))
+local app = Startup.new()
 
-Startup.run()
+app:add(require("@controllers/hello-controller"))
+app:add(require("@controllers/world-controller"))
+
+app:run()
 ```
 
 When on server.
 ```luau
 local Startup = require("path/to/startup")
 
-Startup.add(require("@services/hello-service"))
+local app = Startup.new()
 
-Startup.run()
+app:add(require("@services/hello-service"))
+
+app:run()
 ```

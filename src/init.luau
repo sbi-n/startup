@@ -22,7 +22,7 @@ export type Startup = typeof(setmetatable(
 	Startup
 ))
 
-function Startup.new()
+function Startup.new(): Startup
 	local self = setmetatable({
 		modules = {},
 	}, Startup)
@@ -46,6 +46,8 @@ end
 
 function Startup.add(self: Startup, module)
 	table.insert(self.modules, module :: Module)
+
+	return self
 end
 
 function Startup.run(self: Startup)

@@ -20,14 +20,13 @@ Test.suite("App", function(suite)
 
     suite:case("Execute", function(assert)
         local executed = false
-
-        local app = Startup.new()
         local module = {}
 
         function module.onStart()
             executed = true
         end
 
+        local app = Startup.new()
         app:add(module)
         app:execute("onStart")
 
