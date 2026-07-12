@@ -4,15 +4,15 @@ local Startup = {}
 Startup.__index = Startup
 
 export type Controller = {
-	onRender: (deltaTime: number) -> ()?,
+	read onRender: ((deltaTime: number) -> ())?,
 }
 
 export type Service = {}
 
 export type Module = (Controller | Service) & {
-	onStart: () -> ()?,
-	onStep: (deltaTime: number) -> ()?,
-	[string]: (...any) -> ...any,
+	read onStart: (() -> ())?,
+	read onStep: ((deltaTime: number) -> ())?,
+	read [string]: (...any) -> ...any,
 }
 
 export type Startup = typeof(setmetatable(
@@ -32,10 +32,10 @@ end
 
 function Startup.execute(self: Startup, name: string, ...: any)
 	for _, module in self.modules do
-		local func = rawget(module, name)
+		local func = module[name]
 
 		if func then
-			local success, message = xpcall(func, debug.traceback, ...)
+			local success, message = xpcall(func, debug.traceback :: any, ...)
 
 			if not success then
 				warn(`error while running "{name}":\n\n{message}`)
