@@ -44,7 +44,7 @@ function Startup.execute(self: Startup, name: string, ...: any)
 	end
 end
 
-function Startup.add(self: Startup, module)
+function Startup.add(self: Startup, module: any): Startup
 	table.insert(self.modules, module :: Module)
 
 	return self
@@ -58,7 +58,7 @@ function Startup.run(self: Startup)
 	end)
 
 	if RunService:IsClient() then
-		RunService.RenderStepped:Connect(function(deltaTime: number)
+		RunService.PreRender:Connect(function(deltaTime: number)
 			self:execute("onRender", deltaTime)
 		end)
 	end
