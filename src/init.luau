@@ -1,6 +1,6 @@
 local RunService = game and game:GetService("RunService")
 
-local Promise = require("@pkgs/typed-promise")
+local Promise = require(script.Parent:WaitForChild("typed-promise")) :: any
 
 local Startup = {}
 Startup.__index = Startup

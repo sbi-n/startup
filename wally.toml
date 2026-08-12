@@ -1,9 +1,10 @@
 [package]
 name = "sbi-n/startup"
 description = "https://github.com/sbi-n/startup"
-version = "0.3.0"
+version = "0.3.1"
 license = "MIT"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 
 [dependencies]
+typed-promise = "lukadev-0/typed-promise@4.0.2"
