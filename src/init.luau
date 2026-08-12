@@ -1,6 +1,6 @@
 local RunService = game and game:GetService("RunService")
 
-local Promise = require(script.Parent:WaitForChild("typed-promise")) :: any
+local Promise = require(script.Parent:WaitForChild("typed-promise"))
 
 local Startup = {}
 Startup.__index = Startup
