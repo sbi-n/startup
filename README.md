@@ -47,3 +47,12 @@ end
 Players.PlayerAdded:Connect(playerAdded)
 
 ```
+
+# Exception
+```luau
+local app = Startup.new()
+
+app:exception(function(err: string) -- the promise error message
+    print(err)
+end)
+```

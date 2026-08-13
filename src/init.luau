@@ -21,6 +21,7 @@ export type Module = (Controller | Service) & {
 export type Startup = typeof(setmetatable(
 	{} :: {
 		modules: { Module },
+		exceptions: { (err: string) -> () }
 	},
 	Startup
 ))
@@ -40,13 +41,22 @@ function Startup.execute<TArgs...>(self: Startup, name: string, ...: TArgs...): 
 		local func = module[name]
 
 		if func then
-			local promise = Promise.try(func, ...) :: Promise.TypedPromise<unknown>
+			local promise = Promise.try(func, ...)
+				:catch(function(err)
+					for _, func in self.exceptions do
+						task.spawn(pcall, error, tostring(err))
+					end
+				end) :: Promise.TypedPromise<unknown>
 
 			table.insert(promises, promise)
 		end
 	end
 
-	return Promise.all(promises)
+	return Promise.allSettled(promises)
+end
+
+function Startup.exception(self: Startup, func: (err: string) -> ())
+	table.insert(self.exceptions, func)
 end
 
 function Startup.add(self: Startup, module: any): Startup
@@ -54,6 +64,7 @@ function Startup.add(self: Startup, module: any): Startup
 
 	return self
 end
+
 
 function Startup.run(self: Startup)
 	self:execute("onStart"):andThenCall(function()
