@@ -28,7 +28,7 @@ app:add(require("@services/hello-service"))
 app:run()
 ```
 
-# Custom
+# Extend
 ```luau
 local app = Startup.new()
 
@@ -52,7 +52,7 @@ Players.PlayerAdded:Connect(playerAdded)
 ```luau
 local app = Startup.new()
 
-app:exception(function(err: string) -- the promise error message
+app:except(function(err: unknown) -- the promise error handler, single.
     print(err)
 end)
 ```

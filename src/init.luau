@@ -21,7 +21,7 @@ export type Module = (Controller | Service) & {
 export type Startup = typeof(setmetatable(
 	{} :: {
 		modules: { Module },
-		exceptions: { (err: string) -> () },
+		exception: ((err: unknown) -> ())?,
 	},
 	Startup
 ))
@@ -29,24 +29,22 @@ export type Startup = typeof(setmetatable(
 function Startup.new(): Startup
 	local self = setmetatable({
 		modules = {},
-		exceptions = {},
+		exception = nil :: any,
 	}, Startup)
 
 	return self
 end
 
-function Startup.execute<TArgs...>(self: Startup, name: string, ...: TArgs...): Promise.TypedPromise<{ unknown }>
+function Startup.execute<TArgs...>(self: Startup, name: string, ...: TArgs...): Promise.TypedPromise<{ Promise.Status }>
 	local promises = {} :: { Promise.TypedPromise<unknown> }
 
 	for _, module in self.modules do
 		local func = module[name]
 
 		if func then
-			local promise = Promise.try(func, ...):catch(function(err)
-				for _, exception in self.exceptions do
-					task.spawn(pcall, exception, tostring(err))
-				end
-			end) :: Promise.TypedPromise<unknown>
+			local promise: Promise.TypedPromise<unknown> = if self.exception
+				then Promise.try(func, ...):catch(self.exception)
+				else Promise.try(func, ...)
 
 			table.insert(promises, promise)
 		end
@@ -55,8 +53,10 @@ function Startup.execute<TArgs...>(self: Startup, name: string, ...: TArgs...): 
 	return Promise.allSettled(promises)
 end
 
-function Startup.exception(self: Startup, func: (err: string) -> ())
-	table.insert(self.exceptions, func)
+function Startup.except(self: Startup, func: (err: unknown) -> ())
+	assert(not self.exception, "Exception is already exist.")
+
+	self.exception = func
 end
 
 function Startup.add(self: Startup, module: any): Startup
