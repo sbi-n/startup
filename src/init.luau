@@ -1,6 +1,6 @@
 local RunService = game and game:GetService("RunService")
 
-local Promise = require(script.Parent:WaitForChild("typed-promise"))
+local Promise = require("./packages/roblox/typed-promise")
 
 local Startup = {}
 Startup.__index = Startup
@@ -21,7 +21,7 @@ export type Module = (Controller | Service) & {
 export type Startup = typeof(setmetatable(
 	{} :: {
 		modules: { Module },
-		exceptions: { (err: string) -> () }
+		exceptions: { (err: string) -> () },
 	},
 	Startup
 ))
@@ -29,7 +29,7 @@ export type Startup = typeof(setmetatable(
 function Startup.new(): Startup
 	local self = setmetatable({
 		modules = {},
-		exceptions = {}
+		exceptions = {},
 	}, Startup)
 
 	return self
@@ -42,12 +42,11 @@ function Startup.execute<TArgs...>(self: Startup, name: string, ...: TArgs...): 
 		local func = module[name]
 
 		if func then
-			local promise = Promise.try(func, ...)
-				:catch(function(err)
-					for _, func in self.exceptions do
-						task.spawn(pcall, error, tostring(err))
-					end
-				end) :: Promise.TypedPromise<unknown>
+			local promise = Promise.try(func, ...):catch(function(err)
+				for _, exception in self.exceptions do
+					task.spawn(pcall, exception, tostring(err))
+				end
+			end) :: Promise.TypedPromise<unknown>
 
 			table.insert(promises, promise)
 		end
@@ -65,7 +64,6 @@ function Startup.add(self: Startup, module: any): Startup
 
 	return self
 end
-
 
 function Startup.run(self: Startup)
 	self:execute("onStart"):andThenCall(function()
