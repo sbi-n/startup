@@ -29,6 +29,7 @@ export type Startup = typeof(setmetatable(
 function Startup.new(): Startup
 	local self = setmetatable({
 		modules = {},
+		exceptions = {}
 	}, Startup)
 
 	return self
